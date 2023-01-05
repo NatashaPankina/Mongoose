@@ -11,7 +11,6 @@ class Hero(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.image = Hero.image
         self.rect = self.image.get_rect()
-        print(self.image.get_rect())
         self.mask = pygame.mask.from_surface(self.image)
         self.rect.x = 200
         self.rect.y = 200
@@ -50,8 +49,7 @@ class Labyrinth(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.image = Labyrinth.image
-        self.rect = Rect(0, 0, 1000, 800)
-        print(self.rect)
+        self.rect = self.image.get_rect()
         self.mask = pygame.mask.from_surface(self.image)
 
     def up(self):
@@ -76,8 +74,8 @@ class Labyrinth(pygame.sprite.Sprite):
 if __name__ == '__main__':
     pygame.init()
     size = width, height = 800, 800
-    # screen = pygame.display.set_mode(size)
-    screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+    screen = pygame.display.set_mode(size)
+    # screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
     screen.fill(pygame.Color('white'))
     running = True
     clock = pygame.time.Clock()
