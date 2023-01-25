@@ -19,7 +19,7 @@ SCREEN = -1
 res = cur.execute("""SELECT image FROM life""").fetchall()
 lifes_name = [BytesIO(i[0]) for i in res]
 res = cur.execute("""SELECT image FROM trap_num""").fetchall()
-trap_num = [BytesIO(i[0]) for i in res]
+trap_num = [i[0] for i in res]
 
 Key_chest = cur.execute("""SELECT image FROM other_images WHERE name = 'key_chest'""").fetchone()[0]
 Key_hatch = cur.execute("""SELECT image FROM other_images WHERE name = 'key_hatch'""").fetchone()[0]
@@ -467,7 +467,6 @@ class class_Key_chest(pygame.sprite.Sprite):
 class class_Axe(pygame.sprite.Sprite):
     def __init__(self, name, xy, *group):
         pygame.sprite.Sprite.__init__(self, *group)
-        # image = pygame.image.load(name)
         self.image = pygame.transform.scale(pygame.image.load(BytesIO(name)), (150, 80))
         self.rect = self.image.get_rect()
         self.mask = pygame.mask.from_surface(self.image)
@@ -496,7 +495,6 @@ class class_Axe(pygame.sprite.Sprite):
 class class_Trap(pygame.sprite.Sprite):
     def __init__(self, name, xy, *group):
         pygame.sprite.Sprite.__init__(self, *group)
-        # image = pygame.image.load(name)
         self.image = pygame.image.load(BytesIO(name))
         self.rect = self.image.get_rect()
         self.mask = pygame.mask.from_surface(self.image)
@@ -525,7 +523,6 @@ class class_Trap(pygame.sprite.Sprite):
 class class_No_trap(pygame.sprite.Sprite):
     def __init__(self, name, xy, *group):
         pygame.sprite.Sprite.__init__(self, *group)
-        # image = pygame.image.load(name)
         self.image = pygame.image.load(BytesIO(name))
         self.rect = self.image.get_rect()
         self.mask = pygame.mask.from_surface(self.image)
@@ -554,7 +551,6 @@ class class_No_trap(pygame.sprite.Sprite):
 class class_Chest(pygame.sprite.Sprite):
     def __init__(self, name, xy, *group):
         pygame.sprite.Sprite.__init__(self, *group)
-        # image = pygame.image.load(name)
         self.image = pygame.image.load(BytesIO(name))
         self.rect = self.image.get_rect()
         self.mask = pygame.mask.from_surface(self.image)
@@ -583,7 +579,6 @@ class class_Chest(pygame.sprite.Sprite):
 class class_Hatch(pygame.sprite.Sprite):
     def __init__(self, name, xy, *group):
         pygame.sprite.Sprite.__init__(self, *group)
-        # image = pygame.image.load(name)
         self.image = pygame.image.load(BytesIO(name))
         self.rect = self.image.get_rect()
         self.mask = pygame.mask.from_surface(self.image)
@@ -612,7 +607,6 @@ class class_Hatch(pygame.sprite.Sprite):
 class Inventory(pygame.sprite.Sprite):
     def __init__(self, name, xy, *group):
         pygame.sprite.Sprite.__init__(self, *group)
-        # image = pygame.image.load(name)
         self.image = pygame.transform.scale(pygame.image.load(BytesIO(name)), (150, 80))
         self.rect = self.image.get_rect()
         self.mask = pygame.mask.from_surface(self.image)
@@ -642,7 +636,6 @@ class Check(pygame.sprite.Sprite):
     def __init__(self, xy):
         pygame.sprite.Sprite.__init__(self)
         image = pygame.image.load('white.jpg')
-        # image.set_colorkey((255, 255, 255))
         self.image = pygame.transform.scale(image, (170, 170))
         self.rect = self.image.get_rect()
         self.mask = pygame.mask.from_surface(self.image)
@@ -650,37 +643,9 @@ class Check(pygame.sprite.Sprite):
         self.rect.y = xy[1]
 
 
-class class_Begin(pygame.sprite.Sprite):
-    def __init__(self, name, xy, *group):
-        pygame.sprite.Sprite.__init__(self, *group)
-        self.image = pygame.image.load(BytesIO(name))
-        self.rect = self.image.get_rect()
-        self.mask = pygame.mask.from_surface(self.image)
-        self.rect.x = xy[0]
-        self.rect.y = xy[1]
-
-    def up(self):
-        self.rect.y += 10
-
-    def down(self):
-        self.rect.y -= 10
-
-    def right(self):
-        self.rect.x -= 10
-
-    def left(self):
-        self.rect.x += 10
-
-    def add_image(self):
-        return self.image
-
-    def add_rect(self):
-        return self.rect
-
-
 def first():
     global l, h, protect, lifes, level, key_h, key_c, key_a, image, image2, image3, pers
-    name_obj = [(Chest, (-1343, -2647)), (Hatch, (905, -1300)), (Key_chest, (41, -70)), (Begin, (613, 737))]
+    name_obj = [(Chest, (-1343, -2647)), (Hatch, (905, -1300)), (Key_chest, (41, -70))]
     trapss = [(Trap, (929, -835)), (Trap, (-1513, -2601)), (Trap, (61, -2547)), (Trap, (61, -2420)),
               (Trap, (929, -1055))]
     l = Labyrinth(walls1, floor1)
@@ -690,7 +655,6 @@ def first():
     pers = [i for i in res]
     pers = pers[2:]
     class_Key_chest(*name_obj[2], key_chest)
-    class_Begin(*name_obj[3], begin)
     class_Chest(*name_obj[0], chest)
     class_Hatch(*name_obj[1], hatch)
     protect = 0
@@ -707,20 +671,25 @@ def first():
 
 
 def second():
-    global l, protect, lifes, level, key_h, key_c, key_a, image, image2, image3
-    name_obj = [(Chest, (-1991, -2803)), (Hatch, (-2556, 684)), (Key_chest, (-616, 334)), (Key_hatch, (-2400, -2703)),
-                (Begin, (500, 700))]
+    global l, protect, lifes, level, key_h, key_c, key_a, image, image2, image3, key_hatch, key_chest, axe, chest, hatch, traps, no_traps, invent
+    name_obj = [(Chest, (-1991, -2803)), (Hatch, (-2556, 684)), (Key_chest, (-616, 334)), (Key_hatch, (-2400, -2703))]
     trapss = [(Trap, (-206, -416)), (Trap, (194, -2191)), (Trap, (-2581, -1746)), (Trap, (-2016, -2566)),
               (Trap, (-1906, -2566)), (Trap, (-1796, -2566))]
     l = Labyrinth(walls2, floor2)
+    key_hatch = pygame.sprite.Group()
+    key_chest = pygame.sprite.Group()
+    axe = pygame.sprite.Group()
+    chest = pygame.sprite.Group()
+    hatch = pygame.sprite.Group()
+    traps = pygame.sprite.Group()
+    no_traps = pygame.sprite.Group()
+    invent = pygame.sprite.Group()
     class_Key_hatch(*name_obj[3], key_hatch)
     class_Key_chest(*name_obj[2], key_chest)
-    class_Begin(*name_obj[4], begin)
     class_Chest(*name_obj[0], chest)
     class_Hatch(*name_obj[1], hatch)
     protect = 0
-    lifes = 3
-    level = 1
+    level = 2
     key_h = False
     key_c = False
     key_a = False
@@ -731,31 +700,39 @@ def second():
 
 
 def third():
-    global l, h, protect, lifes, level, key_h, key_c, key_a, image, image2, image3
-    name_obj = [(Chest, (-939, -1837)), (Hatch, (681, -1000)), (Key_chest, (645, 669)), (Axe, (-1891, -2551)),
-                (Begin, (745, 901))]
+    global l, h, protect, lifes, level, key_h, key_c, key_a, image, image2, image3, key_hatch, key_chest, axe, chest, hatch, traps, no_traps, invent
+    name_obj = [(Chest, (-939, -1837)), (Hatch, (681, -1000)), (Key_chest, (645, 669)), (Axe, (-1891, -2551))]
     trapss = [(Trap, (-2283, -2017)), (Trap, (-2079, -1051)), (Trap, (-1443, -1971)), (Trap, (2151, 617)),
               (Trap, (641, -1791)), (Trap, (889, -465)), (Trap, (-546, -1971))]
     l = Labyrinth(walls3, floor3)
+    key_hatch = pygame.sprite.Group()
+    key_chest = pygame.sprite.Group()
+    axe = pygame.sprite.Group()
+    chest = pygame.sprite.Group()
+    hatch = pygame.sprite.Group()
+    traps = pygame.sprite.Group()
+    no_traps = pygame.sprite.Group()
     class_Key_chest(*name_obj[2], key_chest)
-    class_Begin(*name_obj[4], begin)
     class_Axe(*name_obj[3], axe)
     class_Chest(*name_obj[0], chest)
     class_Hatch(*name_obj[1], hatch)
-    protect = 0
-    lifes = 3
-    level = 1
+    level = 3
     key_h = False
     key_c = False
     key_a = False
     image = pygame.image.load(BytesIO(floor3))
+    for i in invent:
+        if i.rect.x != 286 or i.rect.y != 200:
+            invent.remove(i)
     image2 = pygame.transform.scale(pygame.image.load(BytesIO(invent_box)), (500, 300))
     for i in trapss:
         class_Trap(*i, traps)
 
 
 def first_chest():
+    global key_h
     Inventory(Key_hatch, (35, 85), invent)
+    key_h = True
 
 
 def second_chest():
@@ -765,7 +742,9 @@ def second_chest():
 
 
 def third_chest():
+    global key_h
     Inventory(Key_hatch, (35, 85), invent)
+    key_h = True
 
 
 if __name__ == '__main__':
@@ -791,7 +770,6 @@ if __name__ == '__main__':
     axe = pygame.sprite.Group()
     chest = pygame.sprite.Group()
     hatch = pygame.sprite.Group()
-    begin = pygame.sprite.Group()
     animation = 0
     splash2()
     while True:
@@ -814,7 +792,7 @@ if __name__ == '__main__':
         last_pos = (0, 0)
         if animation % 5:
             number = animation % 20 // 5
-        h = Hero(pers[number])
+        # h = Hero(pers[number])
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -975,9 +953,9 @@ if __name__ == '__main__':
 
         for i in traps:
             new = Check((i.rect.x - 30, i.rect.y - 30))
-            if new.rect.colliderect(h) and not (pygame.sprite.spritecollideany(h, traps)) \
-                    and pygame.Rect(screen.get_width() // 3 * 2 + 276, screen.get_height() // 5 * 3 + 190, 240,
-                                    110).collidepoint(last_pos):
+            if new.rect.colliderect(h) and \
+                    pygame.Rect(screen.get_width() // 3 * 2 + 276, screen.get_height() // 5 * 3 + 80, 240,
+                                110).collidepoint(last_pos) and protect >= 1:
                 class_No_trap(No_trap, i.add_rect(), no_traps)
                 traps.remove(i)
                 protect -= 1
@@ -1004,8 +982,8 @@ if __name__ == '__main__':
 
         if (pygame.sprite.spritecollideany(h, chest) and pygame.Rect(screen.get_width() // 3 * 2 + 25,
                                                                      screen.get_height() // 5 * 3 + 190, 240,
-                                                                     110).collidepoint(
-                last_pos) and key_c and level in (1, 2)) or (
+                                                                     110).collidepoint(last_pos) and key_c and (
+                    level == 1 or level == 2)) or (
                 pygame.sprite.spritecollideany(h, chest) and pygame.Rect(screen.get_width() // 3 * 2 + 286,
                                                                          screen.get_height() // 5 * 3 + 190, 240,
                                                                          110).collidepoint(
@@ -1017,9 +995,9 @@ if __name__ == '__main__':
             elif level == 3:
                 third_chest()
 
-        if pygame.sprite.spritecollideany(h, hatch) and pygame.Rect(screen.get_width() // 3 * 2 + 25,
-                                                                    screen.get_height() // 5 * 3 + 190, 240,
-                                                                    110).collidepoint(last_pos) and key_h:
+        if (pygame.sprite.spritecollideany(h, hatch) and pygame.Rect(screen.get_width() // 3 * 2 + 25,
+                                                                     screen.get_height() // 5 * 3 + 80, 240,
+                                                                     110).collidepoint(last_pos) and key_h):
             if level == 1:
                 second()
             elif level == 2:
@@ -1068,6 +1046,7 @@ if __name__ == '__main__':
         screen.blit(screen4, (screen.get_width() // 3 * 2 + 20, screen.get_height() // 5 * 3 - 150))
         pygame.display.flip()
         clock.tick(100)
+        # pygame.time.delay(50)
     pygame.quit()
     final_and_splash('''Ещё раз спасибо за то, что
         зашёл в нашу игру :)
