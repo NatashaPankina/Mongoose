@@ -82,7 +82,7 @@ GRAVITY = 1
 
 class Particle(pygame.sprite.Sprite):
     # сгенерируем частицы разного размера
-    fire = [pygame.image.load('star.png')]
+    fire = [pygame.image.load('data\star.png')]
     for scale in (5, 10, 20):
         fire.append(pygame.transform.scale(fire[0], (scale, scale)))
 
@@ -714,10 +714,10 @@ def first():
     class_Key_chest(*name_obj[2], key_chest)
     class_Chest(*name_obj[0], chest)
     class_Hatch(*name_obj[1], hatch)
-    protect = 4
+    protect = 0
     lifes = 3
     level = 1
-    key_h = True
+    key_h = False
     key_c = False
     key_a = False
     image = pygame.image.load(BytesIO(floor2))
@@ -745,7 +745,7 @@ def second():
     class_Key_chest(*name_obj[2], key_chest)
     class_Chest(*name_obj[0], chest)
     class_Hatch(*name_obj[1], hatch)
-    protect = 2
+    protect = 0
     level = 2
     key_h = False
     key_c = False
@@ -1042,7 +1042,7 @@ if __name__ == '__main__':
             hours = mint // 60
             tt = str(hours) + ':' + str(mint2) + ':' + str(sec2)
             cur.execute('''UPDATE tiiime
-                        set ttt=?''', (timee,))
+                        set ttt=?''', (tt,))
             bd.commit()
             running = False
 
@@ -1078,7 +1078,7 @@ if __name__ == '__main__':
                 hours = mint // 60
                 tt = str(hours) + ':' + str(mint2) + ':' + str(sec2)
                 cur.execute('''UPDATE tiiime
-                            set ttt=?''', (timee,))
+                            set ttt=?''', (tt,))
                 bd.commit()
                 win()
                 running = False
