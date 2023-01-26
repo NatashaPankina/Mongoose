@@ -3,6 +3,7 @@ import sys
 import sqlite3
 from io import BytesIO
 import time
+import random
 from tkinter import *
 from PIL import Image, ImageTk
 
@@ -13,6 +14,7 @@ k = 0
 images = cur.execute(
     'select image, name from other_images where name in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)').fetchall()
 images2 = cur.execute('select image, name from other_images where name in (13, 14, 15, 16, 17)').fetchall()
+pic = cur.execute('select image from other_images where name="bib"').fetchone()[0]
 timee = 0
 SCREEN = -1
 
@@ -53,7 +55,7 @@ def final_and_splash(text):
     can.create_image(400, 275, image=imagee)
     can.create_text(375, 275, text=text, fill='white', justify='center', font='"Segoe Print" 26')
     can.pack()
-    root.after(1, root.destroy)
+    root.after(10000, root.destroy)
     root.mainloop()
 
 
@@ -74,30 +76,83 @@ def text(intro_text, num, coord, center=True, x=None, color='white', font='Verna
         screen.blit(string_rendered, intro_rect)
 
 
+all_sprites = pygame.sprite.Group()
+GRAVITY = 1
+
+
+class Particle(pygame.sprite.Sprite):
+    # сгенерируем частицы разного размера
+    fire = [pygame.image.load('star.png')]
+    for scale in (5, 10, 20):
+        fire.append(pygame.transform.scale(fire[0], (scale, scale)))
+
+    def __init__(self, pos, dx, dy):
+        super().__init__(all_sprites)
+        self.image = random.choice(self.fire)
+        self.rect = self.image.get_rect()
+
+        # у каждой частицы своя скорость — это вектор
+        self.velocity = [dx, dy]
+        # и свои координаты
+        self.rect.x, self.rect.y = pos
+
+        # гравитация будет одинаковой (значение константы)
+        self.gravity = GRAVITY
+
+    def update(self):
+        # применяем гравитационный эффект:
+        # движение с ускорением под действием гравитации
+        self.velocity[1] += self.gravity
+        # перемещаем частицу
+        self.rect.x += self.velocity[0]
+        self.rect.y += self.velocity[1]
+        # убиваем, если частица ушла за экран
+        if not self.rect.colliderect(screen_rect):
+            self.kill()
+
+
+def create_particles(position):
+    # количество создаваемых частиц
+    particle_count = 30
+    # возможные скорости
+    numbers = range(-5, 5)
+    for _ in range(particle_count):
+        Particle(position, random.choice(numbers), random.choice(numbers))
+
+
 def win():
     try:
         global k
-        im_0 = cur.execute("""SELECT image FROM other_images WHERE name = bib'""").fetchone()[0]
+        im = pygame.image.load(BytesIO(pic))
         k = min(im.get_height(), im.get_width()) / minn_side
-        im = pygame.image.load(BytesIO(im_0))
         image = pygame.transform.scale(im, (im.get_width() / (im.get_height() / minn_side), minn_side))
         rect = image.get_rect()
         rect.centerx = screen.get_width() // 2
-        n = 0
+        n = -1
         while True:
+            screen.fill((0, 0, 0))
+            if n == -1:
+                create_particles((0, -35))
+                create_particles((screen.get_width() // 6, -35))
+                create_particles((screen.get_width() // 6 * 2, -35))
+                create_particles((screen.get_width() // 6 * 3, -35))
+                create_particles((screen.get_width() // 6 * 4, -35))
+                create_particles((screen.get_width() // 6 * 5, -35))
+                create_particles((screen.get_width(), -35))
+                all_sprites.draw(screen)
             if n == 0:
                 screen.fill((0, 0, 0))
-                intro_text = ['Я дошёл до конца. Это было очень странное место. Порой,',
-                              'повернувшись, я оказывался в совершенно в другом месте.',
-                              'Но я не сдавался.']
+                intro_text = ['Я прошёл через несколько лабиринтов... Это было очень',
+                              "странное место. Иногда я поворачивался и оказывался в ",
+                              "совершенно неизвестном мне пространстве."]
                 text(intro_text, 50, 150)
             elif n == 1:
                 screen.blit(image, rect)
-                intro_text = ['В конце пути я нашёл библиотеку. Множество интересной информации.',
-                              'Я всё расшифровал. Все наконец-то поверили мне. Я выиграл!']
-                text(intro_text, 35, screen.get_height() - 150)
-            elif n == 3:
-                SCREEN = 1
+                intro_text = ['В конце пути я нашёл библиотеку. Расшифровав каждую книгу в ней,',
+                              'я смог открыть новую цивилизацию. Я стал самым известным археологом',
+                              'в мире. Я добился своего...']
+                text(intro_text, 30, screen.get_height() - 150, False, 430, color='black')
+            elif n == 2:
                 return
             for event in pygame.event.get():
                 if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
@@ -106,9 +161,11 @@ def win():
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                     n += 1
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
-                    running = False
+                    SCREEN = 1
                     return
+            all_sprites.update()
             pygame.display.flip()
+            clock.tick(100)
     except Exception as d:
         print(d)
 
@@ -633,9 +690,9 @@ class Inventory(pygame.sprite.Sprite):
 
 
 class Check(pygame.sprite.Sprite):
-    def __init__(self, xy):
-        pygame.sprite.Sprite.__init__(self)
-        image = pygame.image.load('white.jpg')
+    def __init__(self, xy, *group):
+        pygame.sprite.Sprite.__init__(self, *group)
+        image = pygame.image.load(BytesIO(white))
         self.image = pygame.transform.scale(image, (170, 170))
         self.rect = self.image.get_rect()
         self.mask = pygame.mask.from_surface(self.image)
@@ -757,6 +814,7 @@ if __name__ == '__main__':
     screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
     minn_side = min(screen.get_width(), screen.get_height())
     maxx_screen = max(screen.get_width(), screen.get_height())
+    screen_rect = (0, 0, screen.get_width(), screen.get_height())
     running = True
     clock = pygame.time.Clock()
     traps = pygame.sprite.Group()
@@ -952,7 +1010,8 @@ if __name__ == '__main__':
                         i.down()
 
         for i in traps:
-            new = Check((i.rect.x - 30, i.rect.y - 30))
+            check2 = pygame.sprite.Group()
+            new = Check((i.rect.x - 30, i.rect.y - 30), check2)
             if new.rect.colliderect(h) and \
                     pygame.Rect(screen.get_width() // 3 * 2 + 276, screen.get_height() // 5 * 3 + 80, 240,
                                 110).collidepoint(last_pos) and protect >= 1:
@@ -961,7 +1020,8 @@ if __name__ == '__main__':
                 protect -= 1
                 for i in invent:
                     if i.rect.x == 286 and i.rect.y == 200:
-                        i.image = pygame.image.load(trap_num[protect])
+                        invent.remove(i)
+                        Inventory(trap_num[protect], (286, 200), invent)
 
 
             elif pygame.sprite.spritecollideany(h, traps):
@@ -975,6 +1035,12 @@ if __name__ == '__main__':
         if lifes == 0:
             t = pygame.time.get_ticks()
             timee = t - timee
+            sec = timee // 1000
+            sec2 = sec % 60
+            mint = sec // 60
+            mint2 = mint % 60
+            hours = mint // 60
+            tt = str(hours) + ':' + str(mint2) + ':' + str(sec2)
             cur.execute('''UPDATE tiiime
                         set ttt=?''', (timee,))
             bd.commit()
@@ -987,7 +1053,7 @@ if __name__ == '__main__':
                 pygame.sprite.spritecollideany(h, chest) and pygame.Rect(screen.get_width() // 3 * 2 + 286,
                                                                          screen.get_height() // 5 * 3 + 190, 240,
                                                                          110).collidepoint(
-                last_pos) and key_a and level == 3):
+            last_pos) and key_a and level == 3):
             if level == 1:
                 first_chest()
             elif level == 2:
@@ -1005,9 +1071,16 @@ if __name__ == '__main__':
             elif level == 3:
                 t = pygame.time.get_ticks()
                 timee = t - timee
+                sec = timee // 1000
+                sec2 = sec % 60
+                mint = sec // 60
+                mint2 = mint % 60
+                hours = mint // 60
+                tt = str(hours) + ':' + str(mint2) + ':' + str(sec2)
                 cur.execute('''UPDATE tiiime
                             set ttt=?''', (timee,))
                 bd.commit()
+                win()
                 running = False
 
         if pygame.sprite.spritecollideany(h, axe):
@@ -1053,3 +1126,4 @@ if __name__ == '__main__':
         Всего наилучшего, до новых встреч!''')
 
 bd.close()
+sys.exit()
