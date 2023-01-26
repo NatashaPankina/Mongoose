@@ -714,10 +714,10 @@ def first():
     class_Key_chest(*name_obj[2], key_chest)
     class_Chest(*name_obj[0], chest)
     class_Hatch(*name_obj[1], hatch)
-    protect = 0
+    protect = 4
     lifes = 3
     level = 1
-    key_h = False
+    key_h = True
     key_c = False
     key_a = False
     image = pygame.image.load(BytesIO(floor2))
@@ -745,7 +745,7 @@ def second():
     class_Key_chest(*name_obj[2], key_chest)
     class_Chest(*name_obj[0], chest)
     class_Hatch(*name_obj[1], hatch)
-    protect = 0
+    protect = 2
     level = 2
     key_h = False
     key_c = False
@@ -1013,7 +1013,7 @@ if __name__ == '__main__':
             check2 = pygame.sprite.Group()
             new = Check((i.rect.x - 30, i.rect.y - 30), check2)
             if new.rect.colliderect(h) and \
-                    pygame.Rect(screen.get_width() // 3 * 2 + 276, screen.get_height() // 5 * 3 + 80, 240,
+                    pygame.Rect(screen.get_width() // 3 * 2 + 276, screen.get_height() // 5 * 3 + 200, 240,
                                 110).collidepoint(last_pos) and protect >= 1:
                 class_No_trap(No_trap, i.add_rect(), no_traps)
                 traps.remove(i)
